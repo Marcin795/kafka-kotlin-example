@@ -1,0 +1,34 @@
+networks:
+  kafka-kotlin-example:
+    name: kafka-kotlin-example
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:6.1.0
+    container_name: zookeeper
+    networks:
+      - kafka-kotlin-example
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka:
+    image: confluentinc/cp-kafka:6.1.0
+    container_name: kafka
+    networks:
+      - kafka-kotlin-example
+    ports:
+      - 19092:19092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,CONNECTIONS_FROM_HOST://localhost:19092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONNECTIONS_FROM_HOST:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  app:
+    image: kafka-kotlin-example
+    container_name: app
+    networks:
+      - kafka-kotlin-example
+    depends_on:
+      - kafka
