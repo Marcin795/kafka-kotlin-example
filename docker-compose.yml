@@ -24,6 +24,21 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,CONNECTIONS_FROM_HOST://localhost:19092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONNECTIONS_FROM_HOST:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_SCHEMA_REGISTRY_URL: schema-registry:8081
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:6.1.0
+    container_name: schema-registry
+    depends_on:
+      - zookeeper
+    networks:
+      - kafka-kotlin-example
+    ports:
+      - 8081:8081
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper:2181
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
 
   app:
     image: kafka-kotlin-example
@@ -32,3 +47,4 @@ services:
       - kafka-kotlin-example
     depends_on:
       - kafka
+      - schema-registry
